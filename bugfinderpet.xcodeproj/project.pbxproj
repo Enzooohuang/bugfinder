@@ -1,0 +1,563 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		A04BCF762E1324C1001E3DB3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A04BCF5D2E1324C0001E3DB3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A04BCF642E1324C0001E3DB3;
+			remoteInfo = bugfinderpet;
+		};
+		A04BCF802E1324C1001E3DB3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A04BCF5D2E1324C0001E3DB3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A04BCF642E1324C0001E3DB3;
+			remoteInfo = bugfinderpet;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A04BCF652E1324C0001E3DB3 /* bugfinderpet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = bugfinderpet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A04BCF752E1324C1001E3DB3 /* bugfinderpetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = bugfinderpetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A04BCF7F2E1324C1001E3DB3 /* bugfinderpetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = bugfinderpetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A04BCF672E1324C0001E3DB3 /* bugfinderpet */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = bugfinderpet;
+			sourceTree = "<group>";
+		};
+		A04BCF782E1324C1001E3DB3 /* bugfinderpetTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = bugfinderpetTests;
+			sourceTree = "<group>";
+		};
+		A04BCF822E1324C1001E3DB3 /* bugfinderpetUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = bugfinderpetUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A04BCF622E1324C0001E3DB3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A04BCF722E1324C1001E3DB3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A04BCF7C2E1324C1001E3DB3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A04BCF5C2E1324C0001E3DB3 = {
+			isa = PBXGroup;
+			children = (
+				A04BCF672E1324C0001E3DB3 /* bugfinderpet */,
+				A04BCF782E1324C1001E3DB3 /* bugfinderpetTests */,
+				A04BCF822E1324C1001E3DB3 /* bugfinderpetUITests */,
+				A04BCF662E1324C0001E3DB3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A04BCF662E1324C0001E3DB3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A04BCF652E1324C0001E3DB3 /* bugfinderpet.app */,
+				A04BCF752E1324C1001E3DB3 /* bugfinderpetTests.xctest */,
+				A04BCF7F2E1324C1001E3DB3 /* bugfinderpetUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A04BCF642E1324C0001E3DB3 /* bugfinderpet */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A04BCF892E1324C1001E3DB3 /* Build configuration list for PBXNativeTarget "bugfinderpet" */;
+			buildPhases = (
+				A04BCF612E1324C0001E3DB3 /* Sources */,
+				A04BCF622E1324C0001E3DB3 /* Frameworks */,
+				A04BCF632E1324C0001E3DB3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A04BCF672E1324C0001E3DB3 /* bugfinderpet */,
+			);
+			name = bugfinderpet;
+			packageProductDependencies = (
+			);
+			productName = bugfinderpet;
+			productReference = A04BCF652E1324C0001E3DB3 /* bugfinderpet.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A04BCF742E1324C1001E3DB3 /* bugfinderpetTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A04BCF8C2E1324C1001E3DB3 /* Build configuration list for PBXNativeTarget "bugfinderpetTests" */;
+			buildPhases = (
+				A04BCF712E1324C1001E3DB3 /* Sources */,
+				A04BCF722E1324C1001E3DB3 /* Frameworks */,
+				A04BCF732E1324C1001E3DB3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A04BCF772E1324C1001E3DB3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A04BCF782E1324C1001E3DB3 /* bugfinderpetTests */,
+			);
+			name = bugfinderpetTests;
+			packageProductDependencies = (
+			);
+			productName = bugfinderpetTests;
+			productReference = A04BCF752E1324C1001E3DB3 /* bugfinderpetTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A04BCF7E2E1324C1001E3DB3 /* bugfinderpetUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A04BCF8F2E1324C1001E3DB3 /* Build configuration list for PBXNativeTarget "bugfinderpetUITests" */;
+			buildPhases = (
+				A04BCF7B2E1324C1001E3DB3 /* Sources */,
+				A04BCF7C2E1324C1001E3DB3 /* Frameworks */,
+				A04BCF7D2E1324C1001E3DB3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A04BCF812E1324C1001E3DB3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A04BCF822E1324C1001E3DB3 /* bugfinderpetUITests */,
+			);
+			name = bugfinderpetUITests;
+			packageProductDependencies = (
+			);
+			productName = bugfinderpetUITests;
+			productReference = A04BCF7F2E1324C1001E3DB3 /* bugfinderpetUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A04BCF5D2E1324C0001E3DB3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					A04BCF642E1324C0001E3DB3 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					A04BCF742E1324C1001E3DB3 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = A04BCF642E1324C0001E3DB3;
+					};
+					A04BCF7E2E1324C1001E3DB3 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = A04BCF642E1324C0001E3DB3;
+					};
+				};
+			};
+			buildConfigurationList = A04BCF602E1324C0001E3DB3 /* Build configuration list for PBXProject "bugfinderpet" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A04BCF5C2E1324C0001E3DB3;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A04BCF662E1324C0001E3DB3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A04BCF642E1324C0001E3DB3 /* bugfinderpet */,
+				A04BCF742E1324C1001E3DB3 /* bugfinderpetTests */,
+				A04BCF7E2E1324C1001E3DB3 /* bugfinderpetUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A04BCF632E1324C0001E3DB3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A04BCF732E1324C1001E3DB3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A04BCF7D2E1324C1001E3DB3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A04BCF612E1324C0001E3DB3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A04BCF712E1324C1001E3DB3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A04BCF7B2E1324C1001E3DB3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A04BCF772E1324C1001E3DB3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A04BCF642E1324C0001E3DB3 /* bugfinderpet */;
+			targetProxy = A04BCF762E1324C1001E3DB3 /* PBXContainerItemProxy */;
+		};
+		A04BCF812E1324C1001E3DB3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A04BCF642E1324C0001E3DB3 /* bugfinderpet */;
+			targetProxy = A04BCF802E1324C1001E3DB3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A04BCF872E1324C1001E3DB3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A04BCF882E1324C1001E3DB3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A04BCF8A2E1324C1001E3DB3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"bugfinderpet/Preview Content\"";
+				DEVELOPMENT_TEAM = 6M9Q24G35Y;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Team-Huang.bugfinderpet";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A04BCF8B2E1324C1001E3DB3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"bugfinderpet/Preview Content\"";
+				DEVELOPMENT_TEAM = 6M9Q24G35Y;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Team-Huang.bugfinderpet";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A04BCF8D2E1324C1001E3DB3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6M9Q24G35Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Team-Huang.bugfinderpetTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/bugfinderpet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/bugfinderpet";
+			};
+			name = Debug;
+		};
+		A04BCF8E2E1324C1001E3DB3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6M9Q24G35Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Team-Huang.bugfinderpetTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/bugfinderpet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/bugfinderpet";
+			};
+			name = Release;
+		};
+		A04BCF902E1324C1001E3DB3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6M9Q24G35Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Team-Huang.bugfinderpetUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = bugfinderpet;
+			};
+			name = Debug;
+		};
+		A04BCF912E1324C1001E3DB3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6M9Q24G35Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Team-Huang.bugfinderpetUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = bugfinderpet;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A04BCF602E1324C0001E3DB3 /* Build configuration list for PBXProject "bugfinderpet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A04BCF872E1324C1001E3DB3 /* Debug */,
+				A04BCF882E1324C1001E3DB3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A04BCF892E1324C1001E3DB3 /* Build configuration list for PBXNativeTarget "bugfinderpet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A04BCF8A2E1324C1001E3DB3 /* Debug */,
+				A04BCF8B2E1324C1001E3DB3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A04BCF8C2E1324C1001E3DB3 /* Build configuration list for PBXNativeTarget "bugfinderpetTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A04BCF8D2E1324C1001E3DB3 /* Debug */,
+				A04BCF8E2E1324C1001E3DB3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A04BCF8F2E1324C1001E3DB3 /* Build configuration list for PBXNativeTarget "bugfinderpetUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A04BCF902E1324C1001E3DB3 /* Debug */,
+				A04BCF912E1324C1001E3DB3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A04BCF5D2E1324C0001E3DB3 /* Project object */;
+}
