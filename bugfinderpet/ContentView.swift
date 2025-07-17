@@ -19,12 +19,40 @@ struct ContentView: View {
     @State private var useFrontCamera: Bool = false
     @State private var isFrozen: Bool = false
     @State private var isSwitchingCamera: Bool = false
+    @State private var showingNotificationSettings: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             if permissionManager.isAuthorized {
                 CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera, isFrozen: $isFrozen, isSwitchingCamera: $isSwitchingCamera)
                     .edgesIgnoringSafeArea(.all)
+                
+                // Notification Settings Button - Top Right Corner
+                VStack {
+                    HStack {
+                        Spacer()
+                        
+                        Button(action: {
+                            showingNotificationSettings = true
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.black.opacity(0.6))
+                                    .frame(width: 44, height: 44)
+                                Circle()
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                    .frame(width: 44, height: 44)
+                                Image(systemName: "bell")
+                                    .font(.system(size: 18, weight: .medium))
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .padding(.top, 30)
+                        .padding(.trailing, 20)
+                    }
+                    
+                    Spacer()
+                }
 
                 VStack(spacing: 12) {
                     // Zoom selector (only show for back camera)
@@ -203,6 +231,9 @@ struct ContentView: View {
                 }),
                 secondaryButton: .cancel(Text("Cancel"))
             )
+        }
+        .sheet(isPresented: $showingNotificationSettings) {
+            NotificationSettingsView()
         }
     }
 }
