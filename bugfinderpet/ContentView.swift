@@ -15,35 +15,42 @@ struct ContentView: View {
     @StateObject private var permissionManager = CameraPermissionManager()
     @State private var selectedFilter: FilterType = .general // Default filter
     @State private var zoomFactor: CGFloat = 2.0 // Default zoom
+    @State private var isFlashlightOn: Bool = false
+    @State private var useFrontCamera: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             if permissionManager.isAuthorized {
-                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: $zoomFactor)
+                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera)
                     .edgesIgnoringSafeArea(.all)
 
                 VStack(spacing: 12) {
-                    // Zoom selector (outside the filter box)
-                    HStack(spacing: 16) {
-                        ForEach([1.0, 2.0], id: \.self) { zoom in
-                            ZoomOptionView(
-                                zoom: zoom,
-                                isSelected: zoomFactor == zoom
-                            ) {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    zoomFactor = zoom
+                    // Zoom selector (only show for back camera)
+                    if !useFrontCamera {
+                        HStack(spacing: 16) {
+                            ForEach([1.0, 2.0], id: \.self) { zoom in
+                                ZoomOptionView(
+                                    zoom: zoom,
+                                    isSelected: zoomFactor == zoom
+                                ) {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        zoomFactor = zoom
+                                    }
                                 }
                             }
                         }
+                        .allowsHitTesting(true)
+                        .contentShape(Rectangle())
+                        .transition(.opacity)
+                        
+                        // Add a little vertical space between zoom and filter selector
+                        Spacer().frame(height: 2)
                     }
-                    .allowsHitTesting(true)
-                    .contentShape(Rectangle())
-                    // Add a little vertical space between zoom and filter selector
-                    Spacer().frame(height: 2)
+                    
                     // Filter selector UI
                     VStack(spacing: 0) {
                         VStack(spacing: 16) {
-                        ScrollView(.horizontal, showsIndicators: false) {
+                            ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
                                     ForEach(FilterType.allCases, id: \.self) { filter in
                                         FilterOptionView(
@@ -59,6 +66,79 @@ struct ContentView: View {
                                 .padding(.top, 20)
                                 .padding(.horizontal, 20)
                             }
+                            
+                            // Bottom control buttons inside filter block
+                            HStack {
+                                // Camera flip button (left of center)
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        useFrontCamera.toggle()
+                                    }
+                                }) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.white.opacity(0.2))
+                                            .frame(width: 44, height: 44)
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.5), lineWidth: 2)
+                                            .frame(width: 44, height: 44)
+                                        Image(systemName: "arrow.triangle.2.circlepath.camera.fill")
+                                            .font(.system(size: 18, weight: .medium))
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                                .scaleEffect(useFrontCamera ? 1.1 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: useFrontCamera)
+                                
+                                Spacer()
+                                
+                                // Dummy Freeze button (center)
+                                Button(action: {
+                                    // TODO: Implement freeze functionality
+                                }) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.white.opacity(0.2))
+                                            .frame(width: 60, height: 60)
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.5), lineWidth: 2)
+                                            .frame(width: 60, height: 60)
+                                        Image(systemName: "pause.fill")
+                                            .font(.system(size: 24, weight: .medium))
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                                
+                                Spacer()
+                                
+                                // Flashlight button (right of center)
+                                Button(action: {
+                                    if !useFrontCamera {
+                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                            isFlashlightOn.toggle()
+                                        }
+                                    }
+                                }) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(useFrontCamera ? Color.gray.opacity(0.1) : 
+                                                  (isFlashlightOn ? Color.yellow.opacity(0.3) : Color.white.opacity(0.2)))
+                                            .frame(width: 44, height: 44)
+                                        Circle()
+                                            .stroke(useFrontCamera ? Color.gray.opacity(0.3) : 
+                                                   (isFlashlightOn ? Color.yellow : Color.white.opacity(0.5)), lineWidth: 2)
+                                            .frame(width: 44, height: 44)
+                                        Image(systemName: isFlashlightOn ? "flashlight.on.fill" : "flashlight.off.fill")
+                                            .font(.system(size: 18, weight: .medium))
+                                            .foregroundColor(useFrontCamera ? Color.gray.opacity(0.5) : 
+                                                           (isFlashlightOn ? .yellow : .white))
+                                    }
+                                }
+                                .disabled(useFrontCamera)
+                                .scaleEffect((!useFrontCamera && isFlashlightOn) ? 1.1 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isFlashlightOn)
+                            }
+                            .padding(.horizontal, 20)
                         }
                         .allowsHitTesting(true)
                         .contentShape(Rectangle())

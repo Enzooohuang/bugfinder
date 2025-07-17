@@ -4,6 +4,8 @@ import MetalKit
 struct CameraContainerView: UIViewRepresentable {
     @Binding var selectedFilter: FilterType
     @Binding var zoomFactor: CGFloat
+    @Binding var isFlashlightOn: Bool
+    @Binding var useFrontCamera: Bool
 
     class Coordinator {
         var processor: NativeCameraProcessor?
@@ -17,6 +19,8 @@ struct CameraContainerView: UIViewRepresentable {
         let containerView = UIView(frame: .zero)
         let processor = NativeCameraProcessor(selectedFilter: selectedFilter)
         processor.zoomFactor = zoomFactor
+        processor.isFlashlightOn = isFlashlightOn
+        processor.useFrontCamera = useFrontCamera
         context.coordinator.processor = processor
 
         let metalView = processor.metalView
@@ -34,5 +38,7 @@ struct CameraContainerView: UIViewRepresentable {
     func updateUIView(_ uiView: UIView, context: Context) {
         context.coordinator.processor?.selectedFilter = selectedFilter
         context.coordinator.processor?.zoomFactor = zoomFactor
+        context.coordinator.processor?.isFlashlightOn = isFlashlightOn
+        context.coordinator.processor?.useFrontCamera = useFrontCamera
     }
 }

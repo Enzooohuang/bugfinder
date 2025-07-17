@@ -18,6 +18,22 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             animateZoom(to: zoomFactor)
         }
     }
+    
+    /// Whether the flashlight is currently on.
+    var isFlashlightOn: Bool = false {
+        didSet {
+            toggleFlashlight(isFlashlightOn)
+        }
+    }
+    
+    /// Whether to use the front camera (true) or back camera (false).
+    var useFrontCamera: Bool = false {
+        didSet {
+            if oldValue != useFrontCamera {
+                switchCamera()
+            }
+        }
+    }
 
     /// Metal view that displays the filtered frames.
     let metalView: MTKView
@@ -69,8 +85,9 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         session.beginConfiguration()
         session.sessionPreset = .high
 
+        let position: AVCaptureDevice.Position = useFrontCamera ? .front : .back
         guard
-            let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+            let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position),
             let input = try? AVCaptureDeviceInput(device: camera),
             session.canAddInput(input)
         else {
@@ -541,6 +558,75 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
                     }
                 }
             }
+        }
+    }
+    
+    // MARK: - Camera Control
+    /// Switch between front and back cameras.
+    private func switchCamera() {
+        session.beginConfiguration()
+        
+        // Remove existing input
+        for input in session.inputs {
+            session.removeInput(input)
+        }
+        
+        // Add new camera input
+        let position: AVCaptureDevice.Position = useFrontCamera ? .front : .back
+        guard
+            let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position),
+            let input = try? AVCaptureDeviceInput(device: camera),
+            session.canAddInput(input)
+        else {
+            print("❌ Cannot switch camera")
+            session.commitConfiguration()
+            return
+        }
+        
+        session.addInput(input)
+        self.cameraDevice = camera
+        
+        // Configure new camera
+        do {
+            try camera.lockForConfiguration()
+            
+            if camera.isFocusModeSupported(.continuousAutoFocus) {
+                camera.focusMode = .continuousAutoFocus
+            }
+            if camera.isExposureModeSupported(.continuousAutoExposure) {
+                camera.exposureMode = .continuousAutoExposure
+            }
+            if camera.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) {
+                camera.whiteBalanceMode = .continuousAutoWhiteBalance
+            }
+            
+            camera.unlockForConfiguration()
+        } catch {
+            print("❌ Failed to configure switched camera: \(error)")
+        }
+        
+        session.commitConfiguration()
+        
+        // Turn off flashlight when switching cameras (front camera typically doesn't have flash)
+        if useFrontCamera {
+            isFlashlightOn = false
+        }
+    }
+    
+    /// Toggle the camera flashlight on or off.
+    private func toggleFlashlight(_ isOn: Bool) {
+        guard let camera = cameraDevice, camera.hasTorch else { return }
+        
+        do {
+            try camera.lockForConfiguration()
+            if isOn {
+                try camera.setTorchModeOn(level: 1.0)
+            } else {
+                camera.torchMode = .off
+            }
+            camera.unlockForConfiguration()
+        } catch {
+            print("❌ Failed to toggle flashlight: \(error)")
         }
     }
     
