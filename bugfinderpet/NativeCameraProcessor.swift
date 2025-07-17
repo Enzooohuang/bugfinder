@@ -141,21 +141,21 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             guard let inverted = invertFilter.outputImage else { return }
             let exposureFilter = CIFilter(name: "CIExposureAdjust")!
             exposureFilter.setValue(inverted, forKey: kCIInputImageKey)
-            exposureFilter.setValue(-0.2, forKey: "inputEV")
+            exposureFilter.setValue(-0.35, forKey: "inputEV")
             guard let exposured = exposureFilter.outputImage else { return }
             guard let contrastFilter = CIFilter(name: "CIColorControls") else { return }
             contrastFilter.setValue(exposured, forKey: kCIInputImageKey)
-            contrastFilter.setValue(1.3, forKey: "inputContrast")
-            contrastFilter.setValue(-0.2, forKey: "inputBrightness")
-            contrastFilter.setValue(0.7, forKey: "inputSaturation")
+            contrastFilter.setValue(1.4, forKey: "inputContrast")
+            contrastFilter.setValue(-0.35, forKey: "inputBrightness")
+            contrastFilter.setValue(0.6, forKey: "inputSaturation")
             guard let contrasted = contrastFilter.outputImage else { return }
             let toneCurveFilter = CIFilter(name: "CIToneCurve")!
             toneCurveFilter.setValue(contrasted, forKey: kCIInputImageKey)
             toneCurveFilter.setValue(CIVector(x: 0.0, y: 0.0), forKey: "inputPoint0")
-            toneCurveFilter.setValue(CIVector(x: 0.25, y: 0.2), forKey: "inputPoint1")
-            toneCurveFilter.setValue(CIVector(x: 0.5, y: 0.5), forKey: "inputPoint2")
-            toneCurveFilter.setValue(CIVector(x: 0.75, y: 0.8), forKey: "inputPoint3")
-            toneCurveFilter.setValue(CIVector(x: 1.0, y: 1.0), forKey: "inputPoint4")
+            toneCurveFilter.setValue(CIVector(x: 0.2, y: 0.1), forKey: "inputPoint1")
+            toneCurveFilter.setValue(CIVector(x: 0.4, y: 0.35), forKey: "inputPoint2")
+            toneCurveFilter.setValue(CIVector(x: 0.7, y: 0.75), forKey: "inputPoint3")
+            toneCurveFilter.setValue(CIVector(x: 1.0, y: 0.95), forKey: "inputPoint4")
             guard let toneCurved = toneCurveFilter.outputImage else { return }
             ciOutput = toneCurved
         case .light:
@@ -164,21 +164,21 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             guard let inverted = invertFilter.outputImage else { return }
             let exposureFilter = CIFilter(name: "CIExposureAdjust")!
             exposureFilter.setValue(inverted, forKey: kCIInputImageKey)
-            exposureFilter.setValue(-0.1, forKey: "inputEV")
+            exposureFilter.setValue(-0.3, forKey: "inputEV")
             guard let exposured = exposureFilter.outputImage else { return }
             guard let contrastFilter = CIFilter(name: "CIColorControls") else { return }
             contrastFilter.setValue(exposured, forKey: kCIInputImageKey)
-            contrastFilter.setValue(1.2, forKey: "inputContrast")
-            contrastFilter.setValue(-0.1, forKey: "inputBrightness")
-            contrastFilter.setValue(0.9, forKey: "inputSaturation")
+            contrastFilter.setValue(1.6, forKey: "inputContrast")
+            contrastFilter.setValue(-0.3, forKey: "inputBrightness")
+            contrastFilter.setValue(0.5, forKey: "inputSaturation")
             guard let contrasted = contrastFilter.outputImage else { return }
             let toneCurveFilter = CIFilter(name: "CIToneCurve")!
             toneCurveFilter.setValue(contrasted, forKey: kCIInputImageKey)
             toneCurveFilter.setValue(CIVector(x: 0.0, y: 0.0), forKey: "inputPoint0")
-            toneCurveFilter.setValue(CIVector(x: 0.25, y: 0.2), forKey: "inputPoint1")
-            toneCurveFilter.setValue(CIVector(x: 0.4, y: 0.35), forKey: "inputPoint2")
-            toneCurveFilter.setValue(CIVector(x: 0.7, y: 0.7), forKey: "inputPoint3")
-            toneCurveFilter.setValue(CIVector(x: 1.0, y: 0.95), forKey: "inputPoint4")
+            toneCurveFilter.setValue(CIVector(x: 0.15, y: 0.05), forKey: "inputPoint1")
+            toneCurveFilter.setValue(CIVector(x: 0.4, y: 0.3), forKey: "inputPoint2")
+            toneCurveFilter.setValue(CIVector(x: 0.8, y: 0.85), forKey: "inputPoint3")
+            toneCurveFilter.setValue(CIVector(x: 1.0, y: 1.0), forKey: "inputPoint4")
             guard let toneCurved = toneCurveFilter.outputImage else { return }
             ciOutput = toneCurved
         case .dark:
@@ -187,21 +187,21 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             guard let inverted = invertFilter.outputImage else { return }
             let exposureFilter = CIFilter(name: "CIExposureAdjust")!
             exposureFilter.setValue(inverted, forKey: kCIInputImageKey)
-            exposureFilter.setValue(-0.1, forKey: "inputEV")
+            exposureFilter.setValue(-0.25, forKey: "inputEV")
             guard let exposured = exposureFilter.outputImage else { return }
             guard let contrastFilter = CIFilter(name: "CIColorControls") else { return }
             contrastFilter.setValue(exposured, forKey: kCIInputImageKey)
-            contrastFilter.setValue(1.2, forKey: "inputContrast")
-            contrastFilter.setValue(-0.15, forKey: "inputBrightness")
-            contrastFilter.setValue(0.8, forKey: "inputSaturation")
+            contrastFilter.setValue(1.5, forKey: "inputContrast")
+            contrastFilter.setValue(-0.25, forKey: "inputBrightness")
+            contrastFilter.setValue(0.5, forKey: "inputSaturation")
             guard let contrasted = contrastFilter.outputImage else { return }
             let toneCurveFilter = CIFilter(name: "CIToneCurve")!
             toneCurveFilter.setValue(contrasted, forKey: kCIInputImageKey)
             toneCurveFilter.setValue(CIVector(x: 0.0, y: 0.0), forKey: "inputPoint0")
-            toneCurveFilter.setValue(CIVector(x: 0.2, y: 0.2), forKey: "inputPoint1") // Lower shadows
-            toneCurveFilter.setValue(CIVector(x: 0.5, y: 0.5), forKey: "inputPoint2")
-            toneCurveFilter.setValue(CIVector(x: 0.8, y: 0.9), forKey: "inputPoint3")
-            toneCurveFilter.setValue(CIVector(x: 1.0, y: 1.0), forKey: "inputPoint4")
+            toneCurveFilter.setValue(CIVector(x: 0.15, y: 0.08), forKey: "inputPoint1")
+            toneCurveFilter.setValue(CIVector(x: 0.4, y: 0.35), forKey: "inputPoint2")
+            toneCurveFilter.setValue(CIVector(x: 0.75, y: 0.8), forKey: "inputPoint3")
+            toneCurveFilter.setValue(CIVector(x: 1.0, y: 0.98), forKey: "inputPoint4")
             guard let toneCurved = toneCurveFilter.outputImage else { return }
             ciOutput = toneCurved
         case .brown:
@@ -210,21 +210,21 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             guard let inverted = invertFilter.outputImage else { return }
             let exposureFilter = CIFilter(name: "CIExposureAdjust")!
             exposureFilter.setValue(inverted, forKey: kCIInputImageKey)
-            exposureFilter.setValue(-0.1, forKey: "inputEV")
+            exposureFilter.setValue(-0.28, forKey: "inputEV")
             guard let exposured = exposureFilter.outputImage else { return }
-            let contrastFilter = CIFilter(name: "CIColorControls")!
+            guard let contrastFilter = CIFilter(name: "CIColorControls") else { return }
             contrastFilter.setValue(exposured, forKey: kCIInputImageKey)
-            contrastFilter.setValue(1.25, forKey: "inputContrast")
-            contrastFilter.setValue(-0.15, forKey: "inputBrightness")
-            contrastFilter.setValue(0.85, forKey: "inputSaturation")
+            contrastFilter.setValue(1.45, forKey: "inputContrast")
+            contrastFilter.setValue(-0.28, forKey: "inputBrightness")
+            contrastFilter.setValue(0.55, forKey: "inputSaturation")
             guard let contrasted = contrastFilter.outputImage else { return }
             let toneCurveFilter = CIFilter(name: "CIToneCurve")!
             toneCurveFilter.setValue(contrasted, forKey: kCIInputImageKey)
             toneCurveFilter.setValue(CIVector(x: 0.0, y: 0.0), forKey: "inputPoint0")
-            toneCurveFilter.setValue(CIVector(x: 0.25, y: 0.15), forKey: "inputPoint1")
-            toneCurveFilter.setValue(CIVector(x: 0.5, y: 0.5), forKey: "inputPoint2")
-            toneCurveFilter.setValue(CIVector(x: 0.75, y: 0.85), forKey: "inputPoint3")
-            toneCurveFilter.setValue(CIVector(x: 1.0, y: 1.0), forKey: "inputPoint4")
+            toneCurveFilter.setValue(CIVector(x: 0.18, y: 0.09), forKey: "inputPoint1")
+            toneCurveFilter.setValue(CIVector(x: 0.4, y: 0.37), forKey: "inputPoint2")
+            toneCurveFilter.setValue(CIVector(x: 0.72, y: 0.78), forKey: "inputPoint3")
+            toneCurveFilter.setValue(CIVector(x: 1.0, y: 0.96), forKey: "inputPoint4")
             guard let toneCurved = toneCurveFilter.outputImage else { return }
             ciOutput = toneCurved
         case .golden:
@@ -233,21 +233,21 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             guard let inverted = invertFilter.outputImage else { return }
             let exposureFilter = CIFilter(name: "CIExposureAdjust")!
             exposureFilter.setValue(inverted, forKey: kCIInputImageKey)
-            exposureFilter.setValue(-0.05, forKey: "inputEV")
+            exposureFilter.setValue(-0.22, forKey: "inputEV")
             guard let exposured = exposureFilter.outputImage else { return }
-            let contrastFilter = CIFilter(name: "CIColorControls")!
+            guard let contrastFilter = CIFilter(name: "CIColorControls") else { return }
             contrastFilter.setValue(exposured, forKey: kCIInputImageKey)
-            contrastFilter.setValue(1.15, forKey: "inputContrast")
-            contrastFilter.setValue(-0.1, forKey: "inputBrightness")
-            contrastFilter.setValue(1.0, forKey: "inputSaturation")
+            contrastFilter.setValue(1.35, forKey: "inputContrast")
+            contrastFilter.setValue(-0.22, forKey: "inputBrightness")
+            contrastFilter.setValue(0.65, forKey: "inputSaturation")
             guard let contrasted = contrastFilter.outputImage else { return }
             let toneCurveFilter = CIFilter(name: "CIToneCurve")!
             toneCurveFilter.setValue(contrasted, forKey: kCIInputImageKey)
             toneCurveFilter.setValue(CIVector(x: 0.0, y: 0.0), forKey: "inputPoint0")
-            toneCurveFilter.setValue(CIVector(x: 0.3, y: 0.25), forKey: "inputPoint1")
-            toneCurveFilter.setValue(CIVector(x: 0.5, y: 0.5), forKey: "inputPoint2")
-            toneCurveFilter.setValue(CIVector(x: 0.75, y: 0.8), forKey: "inputPoint3")
-            toneCurveFilter.setValue(CIVector(x: 1.0, y: 0.95), forKey: "inputPoint4")
+            toneCurveFilter.setValue(CIVector(x: 0.22, y: 0.12), forKey: "inputPoint1")
+            toneCurveFilter.setValue(CIVector(x: 0.45, y: 0.4), forKey: "inputPoint2")
+            toneCurveFilter.setValue(CIVector(x: 0.73, y: 0.77), forKey: "inputPoint3")
+            toneCurveFilter.setValue(CIVector(x: 1.0, y: 0.94), forKey: "inputPoint4")
             guard let toneCurved = toneCurveFilter.outputImage else { return }
             ciOutput = toneCurved
         case .gray:
@@ -256,21 +256,21 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             guard let inverted = invertFilter.outputImage else { return }
             let exposureFilter = CIFilter(name: "CIExposureAdjust")!
             exposureFilter.setValue(inverted, forKey: kCIInputImageKey)
-            exposureFilter.setValue(0.0, forKey: "inputEV")
+            exposureFilter.setValue(-0.3, forKey: "inputEV")
             guard let exposured = exposureFilter.outputImage else { return }
-            let contrastFilter = CIFilter(name: "CIColorControls")!
+            guard let contrastFilter = CIFilter(name: "CIColorControls") else { return }
             contrastFilter.setValue(exposured, forKey: kCIInputImageKey)
-            contrastFilter.setValue(1.15, forKey: "inputContrast")
-            contrastFilter.setValue(-0.1, forKey: "inputBrightness")
-            contrastFilter.setValue(0.9, forKey: "inputSaturation")
+            contrastFilter.setValue(1.5, forKey: "inputContrast")
+            contrastFilter.setValue(-0.3, forKey: "inputBrightness")
+            contrastFilter.setValue(0.4, forKey: "inputSaturation")
             guard let contrasted = contrastFilter.outputImage else { return }
             let toneCurveFilter = CIFilter(name: "CIToneCurve")!
             toneCurveFilter.setValue(contrasted, forKey: kCIInputImageKey)
             toneCurveFilter.setValue(CIVector(x: 0.0, y: 0.0), forKey: "inputPoint0")
-            toneCurveFilter.setValue(CIVector(x: 0.3, y: 0.3), forKey: "inputPoint1")
-            toneCurveFilter.setValue(CIVector(x: 0.5, y: 0.5), forKey: "inputPoint2")
-            toneCurveFilter.setValue(CIVector(x: 0.7, y: 0.7), forKey: "inputPoint3")
-            toneCurveFilter.setValue(CIVector(x: 1.0, y: 1.0), forKey: "inputPoint4")
+            toneCurveFilter.setValue(CIVector(x: 0.2, y: 0.1), forKey: "inputPoint1")
+            toneCurveFilter.setValue(CIVector(x: 0.4, y: 0.35), forKey: "inputPoint2")
+            toneCurveFilter.setValue(CIVector(x: 0.7, y: 0.75), forKey: "inputPoint3")
+            toneCurveFilter.setValue(CIVector(x: 1.0, y: 0.95), forKey: "inputPoint4")
             guard let toneCurved = toneCurveFilter.outputImage else { return }
             ciOutput = toneCurved
         case .edge:
