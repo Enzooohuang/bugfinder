@@ -18,11 +18,12 @@ struct ContentView: View {
     @State private var isFlashlightOn: Bool = false
     @State private var useFrontCamera: Bool = false
     @State private var isFrozen: Bool = false
+    @State private var isSwitchingCamera: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             if permissionManager.isAuthorized {
-                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera, isFrozen: $isFrozen)
+                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera, isFrozen: $isFrozen, isSwitchingCamera: $isSwitchingCamera)
                     .edgesIgnoringSafeArea(.all)
 
                 VStack(spacing: 12) {
@@ -33,9 +34,9 @@ struct ContentView: View {
                                 ZoomOptionView(
                                     zoom: zoom,
                                     isSelected: zoomFactor == zoom,
-                                    isDisabled: isFrozen
+                                    isDisabled: isFrozen || isSwitchingCamera
                                 ) {
-                                    if !isFrozen {
+                                    if !isFrozen && !isSwitchingCamera {
                                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                             zoomFactor = zoom
                                         }
@@ -60,9 +61,9 @@ struct ContentView: View {
                                         FilterOptionView(
                                             filter: filter,
                                             isSelected: filter == selectedFilter,
-                                            isDisabled: isFrozen
+                                            isDisabled: isFrozen || isSwitchingCamera
                                         ) {
-                                            if !isFrozen {
+                                            if !isFrozen && !isSwitchingCamera {
                                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                                     selectedFilter = filter
                                                 }
@@ -78,7 +79,7 @@ struct ContentView: View {
                             HStack {
                                 // Camera flip button (left of center)
                                 Button(action: {
-                                    if !isFrozen {
+                                    if !isFrozen && !isSwitchingCamera {
                                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                             useFrontCamera.toggle()
                                         }
@@ -86,48 +87,54 @@ struct ContentView: View {
                                 }) {
                                     ZStack {
                                         Circle()
-                                            .fill(isFrozen ? Color.gray.opacity(0.1) : Color.white.opacity(0.2))
+                                            .fill((isFrozen || isSwitchingCamera) ? Color.gray.opacity(0.1) : Color.white.opacity(0.2))
                                             .frame(width: 44, height: 44)
                                         Circle()
-                                            .stroke(isFrozen ? Color.gray.opacity(0.3) : Color.white.opacity(0.5), lineWidth: 2)
+                                            .stroke((isFrozen || isSwitchingCamera) ? Color.gray.opacity(0.3) : Color.white.opacity(0.5), lineWidth: 2)
                                             .frame(width: 44, height: 44)
                                         Image(systemName: "arrow.triangle.2.circlepath.camera.fill")
                                             .font(.system(size: 18, weight: .medium))
-                                            .foregroundColor(isFrozen ? Color.gray.opacity(0.5) : .white)
+                                            .foregroundColor((isFrozen || isSwitchingCamera) ? Color.gray.opacity(0.5) : .white)
                                     }
                                 }
-                                .disabled(isFrozen)
-                                .scaleEffect((!isFrozen && useFrontCamera) ? 1.1 : 1.0)
+                                .disabled(isFrozen || isSwitchingCamera)
+                                .scaleEffect((!isFrozen && !isSwitchingCamera && useFrontCamera) ? 1.1 : 1.0)
                                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: useFrontCamera)
                                 
                                 Spacer()
                                 
                                 // Freeze button (center)
                                 Button(action: {
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                        isFrozen.toggle()
+                                    if !isSwitchingCamera {
+                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                            isFrozen.toggle()
+                                        }
                                     }
                                 }) {
                                     ZStack {
                                         Circle()
-                                            .fill(isFrozen ? Color.yellow.opacity(0.3) : Color.white.opacity(0.2))
+                                            .fill(isSwitchingCamera ? Color.gray.opacity(0.1) : 
+                                                  (isFrozen ? Color.yellow.opacity(0.3) : Color.white.opacity(0.2)))
                                             .frame(width: 60, height: 60)
                                         Circle()
-                                            .stroke(isFrozen ? Color.yellow : Color.white.opacity(0.5), lineWidth: 2)
+                                            .stroke(isSwitchingCamera ? Color.gray.opacity(0.3) : 
+                                                   (isFrozen ? Color.yellow : Color.white.opacity(0.5)), lineWidth: 2)
                                             .frame(width: 60, height: 60)
                                         Image(systemName: isFrozen ? "play.fill" : "pause.fill")
                                             .font(.system(size: 24, weight: .medium))
-                                            .foregroundColor(isFrozen ? .yellow : .white)
+                                            .foregroundColor(isSwitchingCamera ? Color.gray.opacity(0.5) : 
+                                                           (isFrozen ? .yellow : .white))
                                     }
                                 }
-                                .scaleEffect(isFrozen ? 1.1 : 1.0)
+                                .disabled(isSwitchingCamera)
+                                .scaleEffect((!isSwitchingCamera && isFrozen) ? 1.1 : 1.0)
                                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isFrozen)
                                 
                                 Spacer()
                                 
                                 // Flashlight button (right of center)
                                 Button(action: {
-                                    if !useFrontCamera && !isFrozen {
+                                    if !useFrontCamera && !isFrozen && !isSwitchingCamera {
                                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                             isFlashlightOn.toggle()
                                         }
@@ -135,21 +142,21 @@ struct ContentView: View {
                                 }) {
                                     ZStack {
                                         Circle()
-                                            .fill((useFrontCamera || isFrozen) ? Color.gray.opacity(0.1) : 
+                                            .fill((useFrontCamera || isFrozen || isSwitchingCamera) ? Color.gray.opacity(0.1) : 
                                                   (isFlashlightOn ? Color.yellow.opacity(0.3) : Color.white.opacity(0.2)))
                                             .frame(width: 44, height: 44)
                                         Circle()
-                                            .stroke((useFrontCamera || isFrozen) ? Color.gray.opacity(0.3) : 
+                                            .stroke((useFrontCamera || isFrozen || isSwitchingCamera) ? Color.gray.opacity(0.3) : 
                                                    (isFlashlightOn ? Color.yellow : Color.white.opacity(0.5)), lineWidth: 2)
                                             .frame(width: 44, height: 44)
                                         Image(systemName: isFlashlightOn ? "flashlight.on.fill" : "flashlight.off.fill")
                                             .font(.system(size: 18, weight: .medium))
-                                            .foregroundColor((useFrontCamera || isFrozen) ? Color.gray.opacity(0.5) : 
+                                            .foregroundColor((useFrontCamera || isFrozen || isSwitchingCamera) ? Color.gray.opacity(0.5) : 
                                                            (isFlashlightOn ? .yellow : .white))
                                     }
                                 }
-                                .disabled(useFrontCamera || isFrozen)
-                                .scaleEffect((!useFrontCamera && !isFrozen && isFlashlightOn) ? 1.1 : 1.0)
+                                .disabled(useFrontCamera || isFrozen || isSwitchingCamera)
+                                .scaleEffect((!useFrontCamera && !isFrozen && !isSwitchingCamera && isFlashlightOn) ? 1.1 : 1.0)
                                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isFlashlightOn)
                             }
                             .padding(.horizontal, 20)

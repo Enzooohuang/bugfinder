@@ -49,7 +49,17 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     }
     
     /// Whether the camera is currently switching (shows black screen).
-    private var isSwitchingCamera: Bool = false
+    var isSwitchingCamera: Bool = false {
+        didSet {
+            // Notify UI about switching state change
+            DispatchQueue.main.async {
+                self.onSwitchingStateChanged?(self.isSwitchingCamera)
+            }
+        }
+    }
+    
+    /// Callback for switching state changes
+    var onSwitchingStateChanged: ((Bool) -> Void)?
 
     /// Metal view that displays the filtered frames.
     let metalView: MTKView

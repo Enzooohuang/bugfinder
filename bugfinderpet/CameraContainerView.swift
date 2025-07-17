@@ -7,6 +7,7 @@ struct CameraContainerView: UIViewRepresentable {
     @Binding var isFlashlightOn: Bool
     @Binding var useFrontCamera: Bool
     @Binding var isFrozen: Bool
+    @Binding var isSwitchingCamera: Bool
 
     class Coordinator {
         var processor: NativeCameraProcessor?
@@ -23,6 +24,11 @@ struct CameraContainerView: UIViewRepresentable {
         processor.isFlashlightOn = isFlashlightOn
         processor.useFrontCamera = useFrontCamera
         processor.isFrozen = isFrozen
+        processor.onSwitchingStateChanged = { switching in
+            DispatchQueue.main.async {
+                self.isSwitchingCamera = switching
+            }
+        }
         context.coordinator.processor = processor
 
         let metalView = processor.metalView
