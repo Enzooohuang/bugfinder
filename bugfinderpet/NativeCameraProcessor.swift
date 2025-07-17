@@ -34,6 +34,19 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
     }
+    
+    /// Whether the camera feed is frozen.
+    var isFrozen: Bool = false {
+        didSet {
+            if isFrozen {
+                session.stopRunning()
+            } else {
+                DispatchQueue.global(qos: .userInitiated).async {
+                    self.session.startRunning()
+                }
+            }
+        }
+    }
 
     /// Metal view that displays the filtered frames.
     let metalView: MTKView

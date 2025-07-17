@@ -17,11 +17,12 @@ struct ContentView: View {
     @State private var zoomFactor: CGFloat = 2.0 // Default zoom
     @State private var isFlashlightOn: Bool = false
     @State private var useFrontCamera: Bool = false
+    @State private var isFrozen: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             if permissionManager.isAuthorized {
-                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera)
+                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera, isFrozen: $isFrozen)
                     .edgesIgnoringSafeArea(.all)
 
                 VStack(spacing: 12) {
@@ -31,10 +32,13 @@ struct ContentView: View {
                             ForEach([1.0, 2.0], id: \.self) { zoom in
                                 ZoomOptionView(
                                     zoom: zoom,
-                                    isSelected: zoomFactor == zoom
+                                    isSelected: zoomFactor == zoom,
+                                    isDisabled: isFrozen
                                 ) {
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                        zoomFactor = zoom
+                                    if !isFrozen {
+                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                            zoomFactor = zoom
+                                        }
                                     }
                                 }
                             }
@@ -55,10 +59,13 @@ struct ContentView: View {
                                     ForEach(FilterType.allCases, id: \.self) { filter in
                                         FilterOptionView(
                                             filter: filter,
-                                            isSelected: filter == selectedFilter
+                                            isSelected: filter == selectedFilter,
+                                            isDisabled: isFrozen
                                         ) {
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                                selectedFilter = filter
+                                            if !isFrozen {
+                                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                                    selectedFilter = filter
+                                                }
                                             }
                                         }
                                     }
@@ -71,49 +78,56 @@ struct ContentView: View {
                             HStack {
                                 // Camera flip button (left of center)
                                 Button(action: {
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                        useFrontCamera.toggle()
+                                    if !isFrozen {
+                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                            useFrontCamera.toggle()
+                                        }
                                     }
                                 }) {
                                     ZStack {
                                         Circle()
-                                            .fill(Color.white.opacity(0.2))
+                                            .fill(isFrozen ? Color.gray.opacity(0.1) : Color.white.opacity(0.2))
                                             .frame(width: 44, height: 44)
                                         Circle()
-                                            .stroke(Color.white.opacity(0.5), lineWidth: 2)
+                                            .stroke(isFrozen ? Color.gray.opacity(0.3) : Color.white.opacity(0.5), lineWidth: 2)
                                             .frame(width: 44, height: 44)
                                         Image(systemName: "arrow.triangle.2.circlepath.camera.fill")
                                             .font(.system(size: 18, weight: .medium))
-                                            .foregroundColor(.white)
+                                            .foregroundColor(isFrozen ? Color.gray.opacity(0.5) : .white)
                                     }
                                 }
-                                .scaleEffect(useFrontCamera ? 1.1 : 1.0)
+                                .disabled(isFrozen)
+                                .scaleEffect((!isFrozen && useFrontCamera) ? 1.1 : 1.0)
                                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: useFrontCamera)
                                 
                                 Spacer()
                                 
-                                // Dummy Freeze button (center)
+                                // Freeze button (center)
                                 Button(action: {
-                                    // TODO: Implement freeze functionality
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        isFrozen.toggle()
+                                    }
                                 }) {
                                     ZStack {
                                         Circle()
-                                            .fill(Color.white.opacity(0.2))
+                                            .fill(isFrozen ? Color.yellow.opacity(0.3) : Color.white.opacity(0.2))
                                             .frame(width: 60, height: 60)
                                         Circle()
-                                            .stroke(Color.white.opacity(0.5), lineWidth: 2)
+                                            .stroke(isFrozen ? Color.yellow : Color.white.opacity(0.5), lineWidth: 2)
                                             .frame(width: 60, height: 60)
-                                        Image(systemName: "pause.fill")
+                                        Image(systemName: isFrozen ? "play.fill" : "pause.fill")
                                             .font(.system(size: 24, weight: .medium))
-                                            .foregroundColor(.white)
+                                            .foregroundColor(isFrozen ? .yellow : .white)
                                     }
                                 }
+                                .scaleEffect(isFrozen ? 1.1 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isFrozen)
                                 
                                 Spacer()
                                 
                                 // Flashlight button (right of center)
                                 Button(action: {
-                                    if !useFrontCamera {
+                                    if !useFrontCamera && !isFrozen {
                                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                             isFlashlightOn.toggle()
                                         }
@@ -121,21 +135,21 @@ struct ContentView: View {
                                 }) {
                                     ZStack {
                                         Circle()
-                                            .fill(useFrontCamera ? Color.gray.opacity(0.1) : 
+                                            .fill((useFrontCamera || isFrozen) ? Color.gray.opacity(0.1) : 
                                                   (isFlashlightOn ? Color.yellow.opacity(0.3) : Color.white.opacity(0.2)))
                                             .frame(width: 44, height: 44)
                                         Circle()
-                                            .stroke(useFrontCamera ? Color.gray.opacity(0.3) : 
+                                            .stroke((useFrontCamera || isFrozen) ? Color.gray.opacity(0.3) : 
                                                    (isFlashlightOn ? Color.yellow : Color.white.opacity(0.5)), lineWidth: 2)
                                             .frame(width: 44, height: 44)
                                         Image(systemName: isFlashlightOn ? "flashlight.on.fill" : "flashlight.off.fill")
                                             .font(.system(size: 18, weight: .medium))
-                                            .foregroundColor(useFrontCamera ? Color.gray.opacity(0.5) : 
+                                            .foregroundColor((useFrontCamera || isFrozen) ? Color.gray.opacity(0.5) : 
                                                            (isFlashlightOn ? .yellow : .white))
                                     }
                                 }
-                                .disabled(useFrontCamera)
-                                .scaleEffect((!useFrontCamera && isFlashlightOn) ? 1.1 : 1.0)
+                                .disabled(useFrontCamera || isFrozen)
+                                .scaleEffect((!useFrontCamera && !isFrozen && isFlashlightOn) ? 1.1 : 1.0)
                                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isFlashlightOn)
                             }
                             .padding(.horizontal, 20)
@@ -190,6 +204,7 @@ struct ContentView: View {
 struct ZoomOptionView: View {
     let zoom: CGFloat
     let isSelected: Bool
+    let isDisabled: Bool
     let onTap: () -> Void
     
     var body: some View {
@@ -197,9 +212,12 @@ struct ZoomOptionView: View {
             Circle()
                 .fill(
                     LinearGradient(
-                        gradient: Gradient(colors: isSelected ? 
-                            [Color.yellow.opacity(0.3), Color.cyan.opacity(0.2)] :
-                            [Color.white.opacity(0.1), Color.white.opacity(0.05)]
+                        gradient: Gradient(colors: isDisabled ? 
+                            [Color.gray.opacity(0.1), Color.gray.opacity(0.05)] :
+                            (isSelected ? 
+                                [Color.yellow.opacity(0.3), Color.cyan.opacity(0.2)] :
+                                [Color.white.opacity(0.1), Color.white.opacity(0.05)]
+                            )
                         ),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -209,7 +227,8 @@ struct ZoomOptionView: View {
             
             Circle()
                 .stroke(
-                    isSelected ? Color.yellow : Color.white.opacity(0.3),
+                    isDisabled ? Color.gray.opacity(0.3) :
+                    (isSelected ? Color.yellow : Color.white.opacity(0.3)),
                     lineWidth: isSelected ? 2 : 1
                 )
                 .frame(width: 32, height: 32)
@@ -217,9 +236,10 @@ struct ZoomOptionView: View {
             // Zoom text
             Text("\(Int(zoom))x")
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundColor(isSelected ? .yellow : .white.opacity(0.9))
+                .foregroundColor(isDisabled ? Color.gray.opacity(0.5) :
+                               (isSelected ? .yellow : .white.opacity(0.9)))
         }
-        .scaleEffect(isSelected ? 1.1 : 1.0)
+        .scaleEffect((!isDisabled && isSelected) ? 1.1 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         .onTapGesture {
             onTap()
@@ -233,6 +253,7 @@ struct ZoomOptionView: View {
 struct FilterOptionView: View {
     let filter: FilterType
     let isSelected: Bool
+    let isDisabled: Bool
     let onTap: () -> Void
     
     var body: some View {
@@ -242,9 +263,12 @@ struct FilterOptionView: View {
                 Circle()
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: isSelected ? 
-                                [Color.yellow.opacity(0.3), Color.orange.opacity(0.2)] :
-                                [Color.white.opacity(0.1), Color.white.opacity(0.05)]
+                            gradient: Gradient(colors: isDisabled ?
+                                [Color.gray.opacity(0.1), Color.gray.opacity(0.05)] :
+                                (isSelected ? 
+                                    [Color.yellow.opacity(0.3), Color.orange.opacity(0.2)] :
+                                    [Color.white.opacity(0.1), Color.white.opacity(0.05)]
+                                )
                             ),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -254,7 +278,8 @@ struct FilterOptionView: View {
                 
                 Circle()
                     .stroke(
-                        isSelected ? Color.yellow : Color.white.opacity(0.3),
+                        isDisabled ? Color.gray.opacity(0.3) :
+                        (isSelected ? Color.yellow : Color.white.opacity(0.3)),
                         lineWidth: isSelected ? 2 : 1
                     )
                     .frame(width: 50, height: 50)
@@ -265,14 +290,16 @@ struct FilterOptionView: View {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 44, height: 44)
                     .clipShape(Circle())
+                    .opacity(isDisabled ? 0.5 : 1.0)
             }
-                    .scaleEffect(isSelected ? 1.1 : 1.0)
+                    .scaleEffect((!isDisabled && isSelected) ? 1.1 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         
         // Filter name
         Text(filter.rawValue)
             .font(.system(size: 12, weight: .medium, design: .rounded))
-            .foregroundColor(isSelected ? .yellow : .white.opacity(0.9))
+            .foregroundColor(isDisabled ? Color.gray.opacity(0.5) :
+                           (isSelected ? .yellow : .white.opacity(0.9)))
             .lineLimit(1)
     }
     .onTapGesture {

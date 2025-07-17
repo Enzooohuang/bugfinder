@@ -6,6 +6,7 @@ struct CameraContainerView: UIViewRepresentable {
     @Binding var zoomFactor: CGFloat
     @Binding var isFlashlightOn: Bool
     @Binding var useFrontCamera: Bool
+    @Binding var isFrozen: Bool
 
     class Coordinator {
         var processor: NativeCameraProcessor?
@@ -21,6 +22,7 @@ struct CameraContainerView: UIViewRepresentable {
         processor.zoomFactor = zoomFactor
         processor.isFlashlightOn = isFlashlightOn
         processor.useFrontCamera = useFrontCamera
+        processor.isFrozen = isFrozen
         context.coordinator.processor = processor
 
         let metalView = processor.metalView
@@ -40,5 +42,6 @@ struct CameraContainerView: UIViewRepresentable {
         context.coordinator.processor?.zoomFactor = zoomFactor
         context.coordinator.processor?.isFlashlightOn = isFlashlightOn
         context.coordinator.processor?.useFrontCamera = useFrontCamera
+        context.coordinator.processor?.isFrozen = isFrozen
     }
 }
