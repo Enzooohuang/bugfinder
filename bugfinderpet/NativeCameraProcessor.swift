@@ -47,6 +47,9 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
     }
+    
+    /// Whether the camera is currently switching (shows black screen).
+    private var isSwitchingCamera: Bool = false
 
     /// Metal view that displays the filtered frames.
     let metalView: MTKView
@@ -158,9 +161,15 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
 
     // MARK: - Frame Processing Delegate
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        // Show black screen during camera switching
+        if isSwitchingCamera {
+            renderBlackScreen()
+            return
+        }
+        
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         let ciInput = CIImage(cvPixelBuffer: pixelBuffer)
-        let ciOutput: CIImage
+        var ciOutput: CIImage
         
         switch selectedFilter {
         case .normal:
@@ -331,18 +340,28 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         // Render to Metal texture
         guard let drawable = metalView.currentDrawable else { return }
         let transformedImage = ciOutput.oriented(.right)
-        let sourceExtent = transformedImage.extent
+        
+        // Apply horizontal mirroring for front camera AFTER orientation
+        var finalImage = transformedImage
+        if useFrontCamera {
+            let mirrorTransform = CGAffineTransform(scaleX: -1, y: 1)
+            finalImage = transformedImage.transformed(by: mirrorTransform)
+            // Adjust origin to keep image in bounds
+            let translation = CGAffineTransform(translationX: finalImage.extent.width, y: 0)
+            finalImage = finalImage.transformed(by: translation)
+        }
+        let sourceExtent = finalImage.extent
         let targetSize = metalView.drawableSize
         let scaleX = targetSize.width / sourceExtent.width
         let scaleY = targetSize.height / sourceExtent.height
         let scale = max(scaleX, scaleY)
-        let scaledImage = transformedImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+        let scaledImage = finalImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
         let scaledExtent = scaledImage.extent
         let cropX = (scaledExtent.width - targetSize.width) / 2
         let cropY = (scaledExtent.height - targetSize.height) / 2
         let cropRect = CGRect(x: cropX, y: cropY, width: targetSize.width, height: targetSize.height)
-        let finalImage = scaledImage.cropped(to: cropRect)
-        ciContext.render(finalImage, to: drawable.texture, commandBuffer: nil, bounds: finalImage.extent, colorSpace: colorSpace)
+        let croppedImage = scaledImage.cropped(to: cropRect)
+        ciContext.render(croppedImage, to: drawable.texture, commandBuffer: nil, bounds: croppedImage.extent, colorSpace: colorSpace)
         // Present the frame
         drawable.present()
         metalView.draw() // Trigger the view to refresh
@@ -365,6 +384,7 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     }
 
     @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+        guard !isFrozen else { return }
         let location = gesture.location(in: metalView)
         manualFocusAtPoint(location)
     }
@@ -577,6 +597,15 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     // MARK: - Camera Control
     /// Switch between front and back cameras.
     private func switchCamera() {
+        // Show black screen during transition
+        isSwitchingCamera = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.performCameraSwitch()
+        }
+    }
+    
+    private func performCameraSwitch() {
         session.beginConfiguration()
         
         // Remove existing input
@@ -624,6 +653,24 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         if useFrontCamera {
             isFlashlightOn = false
         }
+        
+        // Re-enable camera after a short delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.isSwitchingCamera = false
+        }
+    }
+    
+    /// Render a black screen during camera switching
+    private func renderBlackScreen() {
+        guard let drawable = metalView.currentDrawable else { return }
+        let targetSize = metalView.drawableSize
+        
+        // Create a black image
+        let blackImage = CIImage(color: CIColor.black).cropped(to: CGRect(x: 0, y: 0, width: targetSize.width, height: targetSize.height))
+        
+        ciContext.render(blackImage, to: drawable.texture, commandBuffer: nil, bounds: blackImage.extent, colorSpace: colorSpace)
+        drawable.present()
+        metalView.draw()
     }
     
     /// Toggle the camera flashlight on or off.
