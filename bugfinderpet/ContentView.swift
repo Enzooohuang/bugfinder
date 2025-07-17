@@ -1,24 +1,226 @@
-//
-//  ContentView.swift
-//  bugfinderpet
-//
-//  Created by Yuhao Huang on 6/30/25.
-//
-
 import SwiftUI
 
+enum FilterType: String, CaseIterable {
+    case normal = "Normal"
+    case general = "General"
+    case edge = "Edge"
+    case light = "Light"
+    case dark = "Dark"
+    case brown = "Brown"
+    case golden = "Gold"
+    case gray = "Gray"
+}
+
 struct ContentView: View {
+    @StateObject private var permissionManager = CameraPermissionManager()
+    @State private var selectedFilter: FilterType = .general // Default filter
+    @State private var zoomFactor: CGFloat = 2.0 // Default zoom
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        ZStack(alignment: .bottom) {
+            if permissionManager.isAuthorized {
+                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: $zoomFactor)
+                    .edgesIgnoringSafeArea(.all)
+
+                VStack(spacing: 12) {
+                    // Zoom selector (outside the filter box)
+                    HStack(spacing: 16) {
+                        ForEach([1.0, 2.0], id: \.self) { zoom in
+                            ZoomOptionView(
+                                zoom: zoom,
+                                isSelected: zoomFactor == zoom
+                            ) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    zoomFactor = zoom
+                                }
+                            }
+                        }
+                    }
+                    .allowsHitTesting(true)
+                    .contentShape(Rectangle())
+                    // Add a little vertical space between zoom and filter selector
+                    Spacer().frame(height: 2)
+                    // Filter selector UI
+                    VStack(spacing: 0) {
+                        VStack(spacing: 16) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    ForEach(FilterType.allCases, id: \.self) { filter in
+                                        FilterOptionView(
+                                            filter: filter,
+                                            isSelected: filter == selectedFilter
+                                        ) {
+                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                                selectedFilter = filter
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(.top, 20)
+                                .padding(.horizontal, 20)
+                            }
+                        }
+                        .allowsHitTesting(true)
+                        .contentShape(Rectangle())
+                        .padding(.bottom, 20)
+                    }
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.black.opacity(0.6),
+                                        Color.black.opacity(0.4)
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                            )
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 30)
+                }
+                .padding(.bottom, 0) // Remove extra bottom padding from outer VStack
+            } else {
+                Text("Please grant camera permission to use this feature.")
+                    .padding()
+            }
         }
-        .padding()
+        .onAppear {
+            permissionManager.checkPermission()
+        }
+        .alert(isPresented: $permissionManager.showSettingsAlert) {
+            Alert(
+                title: Text("Camera Permission Required"),
+                message: Text("Please go to system settings to enable camera access."),
+                primaryButton: .default(Text("Open Settings"), action: {
+                    permissionManager.openSettings()
+                }),
+                secondaryButton: .cancel(Text("Cancel"))
+            )
+        }
     }
 }
 
-#Preview {
-    ContentView()
+// Zoom option preview view
+struct ZoomOptionView: View {
+    let zoom: CGFloat
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: isSelected ? 
+                            [Color.yellow.opacity(0.3), Color.cyan.opacity(0.2)] :
+                            [Color.white.opacity(0.1), Color.white.opacity(0.05)]
+                        ),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 32, height: 32)   
+            
+            Circle()
+                .stroke(
+                    isSelected ? Color.yellow : Color.white.opacity(0.3),
+                    lineWidth: isSelected ? 2 : 1
+                )
+                .frame(width: 32, height: 32)
+            
+            // Zoom text
+            Text("\(Int(zoom))x")
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundColor(isSelected ? .yellow : .white.opacity(0.9))
+        }
+        .scaleEffect(isSelected ? 1.1 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+        .onTapGesture {
+            onTap()
+        }
+        .allowsHitTesting(true)
+        .contentShape(Circle())
+    }
+}
+
+// Filter option preview view
+struct FilterOptionView: View {
+    let filter: FilterType
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            // Filter preview circle
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: isSelected ? 
+                                [Color.yellow.opacity(0.3), Color.orange.opacity(0.2)] :
+                                [Color.white.opacity(0.1), Color.white.opacity(0.05)]
+                            ),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 50, height: 50)
+                
+                Circle()
+                    .stroke(
+                        isSelected ? Color.yellow : Color.white.opacity(0.3),
+                        lineWidth: isSelected ? 2 : 1
+                    )
+                    .frame(width: 50, height: 50)
+                
+                // Filter preview image
+                Image(filterImageName(for: filter))
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 44, height: 44)
+                    .clipShape(Circle())
+            }
+                    .scaleEffect(isSelected ? 1.1 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+        
+        // Filter name
+        Text(filter.rawValue)
+            .font(.system(size: 12, weight: .medium, design: .rounded))
+            .foregroundColor(isSelected ? .yellow : .white.opacity(0.9))
+            .lineLimit(1)
+    }
+    .onTapGesture {
+        onTap()
+    }
+    .allowsHitTesting(true)
+    .contentShape(Rectangle())
+    }
+    
+    // Get the corresponding image name for each filter type
+    private func filterImageName(for filter: FilterType) -> String {
+        switch filter {
+        case .normal:
+            return "normal"
+        case .general:
+            return "inverted"
+        case .light:
+            return "light"
+        case .dark:
+            return "dark"
+        case .brown:
+            return "brown"
+        case .golden:
+            return "gold"
+        case .gray:
+            return "gray"
+        case .edge:
+            return "edge"
+        }
+    }
 }
