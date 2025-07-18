@@ -53,7 +53,7 @@ class TrialManager: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                self?.saveCurrentSession()
+                self?.endSession()
             }
         }
         
@@ -63,7 +63,19 @@ class TrialManager: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                self?.saveCurrentSession()
+                self?.endSession()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                // Only restart if we're not purchased and trial hasn't expired
+                guard let self = self, !InAppPurchaseManager.shared.isPurchased, self.canUseApp() else { return }
+                self.startSession()
             }
         }
         
