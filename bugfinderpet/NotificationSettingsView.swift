@@ -6,6 +6,12 @@ struct NotificationSettingsView: View {
     @State private var showingTimePicker = false
     @State private var selectedTime = Date()
     
+    let onDebugTrigger: (() -> Void)?
+    
+    init(onDebugTrigger: (() -> Void)? = nil) {
+        self.onDebugTrigger = onDebugTrigger
+    }
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -25,6 +31,12 @@ struct NotificationSettingsView: View {
                             Image(systemName: "bell.badge")
                                 .font(.system(size: 40))
                                 .foregroundColor(.yellow)
+                                .onLongPressGesture(minimumDuration: 2.0) {
+                                    presentationMode.wrappedValue.dismiss()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        onDebugTrigger?()
+                                    }
+                                }
                             
                             Text("Bug Check Notifications")
                                 .font(.title2)

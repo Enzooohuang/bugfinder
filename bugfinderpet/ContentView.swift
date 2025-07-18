@@ -13,6 +13,8 @@ enum FilterType: String, CaseIterable {
 
 struct ContentView: View {
     @StateObject private var permissionManager = CameraPermissionManager()
+    @StateObject private var trialManager = TrialManager.shared
+    @StateObject private var purchaseManager = InAppPurchaseManager.shared
     @State private var selectedFilter: FilterType = .general // Default filter
     @State private var zoomFactor: CGFloat = 2.0 // Default zoom
     @State private var isFlashlightOn: Bool = false
@@ -20,18 +22,57 @@ struct ContentView: View {
     @State private var isFrozen: Bool = false
     @State private var isSwitchingCamera: Bool = false
     @State private var showingNotificationSettings: Bool = false
+    @State private var showingPurchaseOverlay: Bool = false
+    @State private var showingDebugSettings: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             if permissionManager.isAuthorized {
-                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: useFrontCamera ? .constant(1.0) : $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera, isFrozen: $isFrozen, isSwitchingCamera: $isSwitchingCamera)
-                    .edgesIgnoringSafeArea(.all)
+                if trialManager.canUseApp() {
+                    CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: useFrontCamera ? .constant(1.0) : $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera, isFrozen: $isFrozen, isSwitchingCamera: $isSwitchingCamera)
+                        .edgesIgnoringSafeArea(.all)
+                        .onAppear {
+                            trialManager.startSession()
+                        }
+                        .onDisappear {
+                            trialManager.endSession()
+                        }
+                } else {
+                    // Show purchase screen when trial expired
+                    Color.black.edgesIgnoringSafeArea(.all)
+                }
                 
-                // Notification Settings Button - Top Right Corner
+                // Top UI elements
                 VStack {
                     HStack {
+                        // Trial timer (top left if not purchased)
+                        if !purchaseManager.isPurchased && trialManager.canUseApp() {
+                            VStack(spacing: 4) {
+                                Text("Trial")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                Text(trialManager.getFormattedTimeRemaining())
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.yellow)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.black.opacity(0.6))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                    )
+                            )
+                            .padding(.top, 30)
+                            .padding(.leading, 20)
+                        }
+                        
                         Spacer()
                         
+                        // Notification Settings Button - Top Right Corner
                         Button(action: {
                             showingNotificationSettings = true
                         }) {
@@ -233,7 +274,28 @@ struct ContentView: View {
             )
         }
         .sheet(isPresented: $showingNotificationSettings) {
-            NotificationSettingsView()
+            NotificationSettingsView(onDebugTrigger: {
+                showingDebugSettings = true
+            })
+        }
+        .sheet(isPresented: $showingDebugSettings) {
+            DebugSettingsView()
+        }
+        .fullScreenCover(isPresented: $showingPurchaseOverlay) {
+            PurchaseOverlayView(onDebugTrigger: {
+                showingDebugSettings = true
+            })
+        }
+        .onChange(of: trialManager.isTrialExpired) { _, isExpired in
+            if isExpired && !purchaseManager.isPurchased {
+                showingPurchaseOverlay = true
+            }
+        }
+        .onAppear {
+            // Show purchase overlay immediately if trial is already expired
+            if trialManager.isTrialExpired && !purchaseManager.isPurchased {
+                showingPurchaseOverlay = true
+            }
         }
     }
 }
