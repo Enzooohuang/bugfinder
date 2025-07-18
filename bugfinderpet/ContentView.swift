@@ -24,7 +24,7 @@ struct ContentView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             if permissionManager.isAuthorized {
-                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera, isFrozen: $isFrozen, isSwitchingCamera: $isSwitchingCamera)
+                CameraContainerView(selectedFilter: $selectedFilter, zoomFactor: useFrontCamera ? .constant(1.0) : $zoomFactor, isFlashlightOn: $isFlashlightOn, useFrontCamera: $useFrontCamera, isFrozen: $isFrozen, isSwitchingCamera: $isSwitchingCamera)
                     .edgesIgnoringSafeArea(.all)
                 
                 // Notification Settings Button - Top Right Corner
