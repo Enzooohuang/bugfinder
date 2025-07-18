@@ -38,12 +38,12 @@ struct NotificationSettingsView: View {
                                     }
                                 }
                             
-                            Text("Bug Check Notifications")
+                            Text("Post-Walk Bug Checks")
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
                             
-                            Text("Set when you want to be reminded to check for bugs")
+                            Text("Set reminders to check for bugs after outdoor walks")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                                 .multilineTextAlignment(.center)
@@ -54,11 +54,11 @@ struct NotificationSettingsView: View {
                         VStack(spacing: 16) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("Enable Notifications")
+                                    Text("Enable Walk Reminders")
                                         .font(.headline)
                                         .foregroundColor(.white)
                                     
-                                    Text("Receive daily reminders to check for bugs")
+                                    Text("Get reminders to check for bugs after walks")
                                         .font(.caption)
                                         .foregroundColor(.gray)
                                 }
@@ -84,7 +84,7 @@ struct NotificationSettingsView: View {
                             if notificationManager.isNotificationsEnabled {
                                 VStack(alignment: .leading, spacing: 16) {
                                     HStack {
-                                        Text("Notification Times")
+                                        Text("Reminder Times")
                                             .font(.headline)
                                             .foregroundColor(.white)
                                         
@@ -101,7 +101,7 @@ struct NotificationSettingsView: View {
                                     }
                                     
                                     if notificationManager.notificationTimes.isEmpty {
-                                        Text("No notification times set")
+                                        Text("No reminder times set")
                                             .font(.subheadline)
                                             .foregroundColor(.gray)
                                             .padding(.vertical, 20)

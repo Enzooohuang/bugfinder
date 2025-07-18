@@ -136,8 +136,8 @@ class NotificationManager: ObservableObject {
         for (timeIndex, time) in notificationTimes.enumerated() {
             for weekday in time.weekdays {
                 let content = UNMutableNotificationContent()
-                content.title = "Bug Check Reminder"
-                content.body = "Time to check for bugs with your pet detective!"
+                content.title = "Post-Walk Bug Check"
+                content.body = "Did you walk your pet recently? Check for fleas and ticks! 🐕"
                 content.sound = .default
                 
                 var dateComponents = DateComponents()

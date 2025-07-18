@@ -19,27 +19,32 @@ struct PurchaseOverlayView: View {
             Color.black.opacity(0.8)
                 .ignoresSafeArea()
             
-            VStack(spacing: 24) {
+            VStack(spacing: 32) {
                 // Header
-                VStack(spacing: 16) {
+                VStack(spacing: 20) {
                     Image(systemName: "crown.fill")
                         .font(.system(size: 50))
                         .foregroundColor(.yellow)
                         .onLongPressGesture(minimumDuration: 2.0) {
-                            onDebugTrigger?()
+                            dismiss()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                onDebugTrigger?()
+                            }
                         }
                     
-                    Text("Unlock Full Access")
+                    Text("Protect Your Pet")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                     
                     if trialManager.isTrialExpired {
-                        Text("Your 5-minute trial has ended")
+                        Text("Continue protecting your pet's health")
                             .font(.subheadline)
-                            .foregroundColor(.red)
+                            .foregroundColor(.orange)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 16)
                     } else {
-                        VStack(spacing: 4) {
+                        VStack(spacing: 8) {
                             Text("Trial time remaining:")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
@@ -53,15 +58,15 @@ struct PurchaseOverlayView: View {
                 }
                 
                 // Features list
-                VStack(alignment: .leading, spacing: 12) {
-                    FeatureRow(icon: "camera.fill", title: "Unlimited Camera Access", description: "Use all filters without time limits")
-                    FeatureRow(icon: "wand.and.stars", title: "All Premium Filters", description: "Access to all current and future filters")
-                    FeatureRow(icon: "infinity", title: "Lifetime Access", description: "One-time purchase, no subscriptions")
+                VStack(alignment: .leading, spacing: 16) {
+                    FeatureRow(icon: "camera.fill", title: "Unlimited Detection", description: "Find fleas, ticks & insects")
+                    FeatureRow(icon: "wand.and.stars", title: "Advanced Filters", description: "Better visual detection")
+                    FeatureRow(icon: "infinity", title: "Lifetime Access", description: "One-time purchase forever")
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 24)
                 
                 // Purchase button
-                VStack(spacing: 12) {
+                VStack(spacing: 16) {
                     Button(action: {
                         Task {
                             await purchaseManager.purchaseLifetimeAccess()
@@ -77,7 +82,7 @@ struct PurchaseOverlayView: View {
                                     .font(.title3)
                             }
                             
-                            Text("Get Lifetime Access")
+                            Text("Protect Forever")
                                 .font(.headline)
                                 .fontWeight(.bold)
                             
@@ -87,7 +92,7 @@ struct PurchaseOverlayView: View {
                         }
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 56)
+                        .frame(height: 60)
                         .background(
                             LinearGradient(
                                 gradient: Gradient(colors: [Color.yellow, Color.orange]),
@@ -95,7 +100,7 @@ struct PurchaseOverlayView: View {
                                 endPoint: .trailing
                             )
                         )
-                        .cornerRadius(16)
+                        .cornerRadius(18)
                     }
                     .disabled(purchaseManager.isLoading)
                     
@@ -111,7 +116,7 @@ struct PurchaseOverlayView: View {
                     }
                     .disabled(purchaseManager.isLoading)
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 24)
                 
                 // Error message
                 if let errorMessage = purchaseManager.errorMessage {
@@ -119,7 +124,7 @@ struct PurchaseOverlayView: View {
                         .font(.caption)
                         .foregroundColor(.red)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                        .padding(.horizontal, 24)
                 }
                 
                 // Close button (only if trial not expired)
@@ -133,7 +138,7 @@ struct PurchaseOverlayView: View {
                     }
                 }
             }
-            .padding(24)
+            .padding(32)
             .background(
                 RoundedRectangle(cornerRadius: 24)
                     .fill(Color.black)
@@ -163,13 +168,13 @@ struct FeatureRow: View {
     let description: String
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.title3)
+                .font(.title2)
                 .foregroundColor(.yellow)
-                .frame(width: 24)
+                .frame(width: 28, height: 28)
             
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -178,10 +183,12 @@ struct FeatureRow: View {
                 Text(description)
                     .font(.caption)
                     .foregroundColor(.gray)
+                    .lineLimit(2)
             }
             
             Spacer()
         }
+        .padding(.vertical, 4)
     }
 }
 

@@ -55,7 +55,9 @@ struct ContentView: View {
                                     .font(.caption)
                                     .fontWeight(.bold)
                                     .foregroundColor(.yellow)
+                                    .monospacedDigit() // Ensures consistent character width
                             }
+                            .frame(width: 40) // Fixed width for consistent layout
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
                             .background(
@@ -68,6 +70,10 @@ struct ContentView: View {
                             )
                             .padding(.top, 30)
                             .padding(.leading, 20)
+                            .onTapGesture {
+                                trialManager.endSession()
+                                showingPurchaseOverlay = true
+                            }
                         }
                         
                         Spacer()
@@ -289,6 +295,12 @@ struct ContentView: View {
         .onChange(of: trialManager.isTrialExpired) { _, isExpired in
             if isExpired && !purchaseManager.isPurchased {
                 showingPurchaseOverlay = true
+            }
+        }
+        .onChange(of: showingPurchaseOverlay) { _, isShowing in
+            if !isShowing && !purchaseManager.isPurchased && trialManager.canUseApp() {
+                // User dismissed purchase overlay and still has trial time - resume timer
+                trialManager.startSession()
             }
         }
         .onAppear {

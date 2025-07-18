@@ -124,7 +124,6 @@ class InAppPurchaseManager: NSObject, ObservableObject {
         await transaction.finish()
     }
     
-    /// Get the product price as a formatted string
     func getFormattedPrice() -> String {
         guard let product = products.first else { return "$1.99" }
         return product.displayPrice
