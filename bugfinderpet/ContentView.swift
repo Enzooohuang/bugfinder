@@ -72,6 +72,8 @@ struct ContentView: View {
                             .padding(.leading, 20)
                             .onTapGesture {
                                 trialManager.endSession()
+                                // Dismiss notification settings if open before showing purchase overlay
+                                showingNotificationSettings = false
                                 showingPurchaseOverlay = true
                             }
                         }
@@ -294,12 +296,23 @@ struct ContentView: View {
         }
         .onChange(of: trialManager.isTrialExpired) { _, isExpired in
             if isExpired && !purchaseManager.isPurchased {
+                // Dismiss notification settings if open before showing purchase overlay
+                showingNotificationSettings = false
                 showingPurchaseOverlay = true
             }
         }
         .onChange(of: showingPurchaseOverlay) { _, isShowing in
             if !isShowing && !purchaseManager.isPurchased && trialManager.canUseApp() {
                 // User dismissed purchase overlay and still has trial time - resume timer
+                trialManager.startSession()
+            }
+        }
+        .onChange(of: showingNotificationSettings) { _, isShowing in
+            if isShowing {
+                // Stop trial timer when notification settings are shown
+                trialManager.endSession()
+            } else if !purchaseManager.isPurchased && trialManager.canUseApp() {
+                // Resume trial timer when notification settings are dismissed
                 trialManager.startSession()
             }
         }

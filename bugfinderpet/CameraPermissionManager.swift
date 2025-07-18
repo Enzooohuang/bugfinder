@@ -13,15 +13,15 @@ class CameraPermissionManager: ObservableObject {
             isAuthorized = true
 
         case .notDetermined:
-            AVCaptureDevice.requestAccess(for: .video) { granted in
+            AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                 DispatchQueue.main.async {
-                    self.isAuthorized = granted
+                    self?.isAuthorized = granted
                 }
             }
 
         case .denied, .restricted:
-            DispatchQueue.main.async {
-                self.showSettingsAlert = true
+            DispatchQueue.main.async { [weak self] in
+                self?.showSettingsAlert = true
             }
 
         @unknown default:

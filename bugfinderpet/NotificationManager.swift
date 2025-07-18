@@ -30,18 +30,23 @@ struct NotificationTime: Codable {
             return "Weekends"
         } else {
             let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-            let selectedDays = weekdays.sorted().map { dayNames[$0 - 1] }
+            let selectedDays = weekdays.sorted().compactMap { weekday -> String? in
+                guard weekday >= 1 && weekday <= 7 else { return nil }
+                return dayNames[weekday - 1]
+            }
             return selectedDays.joined(separator: ", ")
         }
     }
     
     static func weekdayName(for weekday: Int) -> String {
         let dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        guard weekday >= 1 && weekday <= 7 else { return "Unknown" }
         return dayNames[weekday - 1]
     }
     
     static func shortWeekdayName(for weekday: Int) -> String {
         let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+        guard weekday >= 1 && weekday <= 7 else { return "??" }
         return dayNames[weekday - 1]
     }
 }
@@ -116,10 +121,10 @@ class NotificationManager: ObservableObject {
     }
     
     func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, error in
             DispatchQueue.main.async {
                 if granted {
-                    self.scheduleNotifications()
+                    self?.scheduleNotifications()
                 }
             }
         }

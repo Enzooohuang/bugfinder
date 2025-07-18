@@ -26,7 +26,7 @@ struct CameraContainerView: UIViewRepresentable {
         processor.isFrozen = isFrozen
         processor.onSwitchingStateChanged = { switching in
             DispatchQueue.main.async {
-                self.isSwitchingCamera = switching
+                isSwitchingCamera = switching
             }
         }
         context.coordinator.processor = processor

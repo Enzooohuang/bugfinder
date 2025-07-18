@@ -53,7 +53,9 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     var isFrozen: Bool = false {
         didSet {
             if isFrozen {
-                session.stopRunning()
+                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                    self?.session.stopRunning()
+                }
             } else {
                 DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                     self?.session.startRunning()
@@ -736,6 +738,9 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         motionManager?.stopAccelerometerUpdates()
         zoomDisplayLink?.invalidate()
         zoomDisplayLink = nil
-        session.stopRunning()
+        // Stop session on background queue to avoid blocking deinit
+        DispatchQueue.global(qos: .utility).async { [session] in
+            session.stopRunning()
+        }
     }
 }
