@@ -5,6 +5,20 @@ import MetalKit
 import SwiftUI
 import CoreMotion
 
+/// Weak reference wrapper for CADisplayLink to avoid retain cycles
+private class WeakDisplayLinkTarget: NSObject {
+    weak var target: NativeCameraProcessor?
+    
+    init(target: NativeCameraProcessor) {
+        self.target = target
+        super.init()
+    }
+    
+    @objc func handleZoomAnimation() {
+        target?.handleZoomAnimation()
+    }
+}
+
 /// Real-time camera processor that applies filters using CoreImage and Metal.
 final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
@@ -41,8 +55,8 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             if isFrozen {
                 session.stopRunning()
             } else {
-                DispatchQueue.global(qos: .userInitiated).async {
-                    self.session.startRunning()
+                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                    self?.session.startRunning()
                 }
             }
         }
@@ -52,7 +66,8 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     var isSwitchingCamera: Bool = false {
         didSet {
             // Notify UI about switching state change
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 self.onSwitchingStateChanged?(self.isSwitchingCamera)
             }
         }
@@ -92,7 +107,9 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     init(selectedFilter: FilterType) {
         // Create Metal device and CIContext
         self.selectedFilter = selectedFilter
-        let device = MTLCreateSystemDefaultDevice()!
+        guard let device = MTLCreateSystemDefaultDevice() else {
+            fatalError("Metal is not supported on this device")
+        }
         metalView = MTKView(frame: .zero, device: device)
         metalView.framebufferOnly = false
         metalView.enableSetNeedsDisplay = false
@@ -159,10 +176,11 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         }
 
         session.commitConfiguration()
-        DispatchQueue.global(qos: .userInitiated).async {
-            self.session.startRunning()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            self?.session.startRunning()
             // Set initial focus to center after camera starts
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self = self else { return }
                 let centerPoint = CGPoint(x: self.metalView.bounds.midX, y: self.metalView.bounds.midY)
                 self.focusAtPoint(centerPoint)
             }
@@ -185,20 +203,20 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         case .normal:
             ciOutput = ciInput
         case .general:
-            guard let invertFilter = CIFilter(name: "CIColorInvert") else { return }
+            guard let invertFilter = createFilter(name: "CIColorInvert") else { return }
             invertFilter.setValue(ciInput, forKey: kCIInputImageKey)
             guard let inverted = invertFilter.outputImage else { return }
-            let exposureFilter = CIFilter(name: "CIExposureAdjust")!
+            guard let exposureFilter = createFilter(name: "CIExposureAdjust") else { return }
             exposureFilter.setValue(inverted, forKey: kCIInputImageKey)
             exposureFilter.setValue(-0.35, forKey: "inputEV")
             guard let exposured = exposureFilter.outputImage else { return }
-            guard let contrastFilter = CIFilter(name: "CIColorControls") else { return }
+            guard let contrastFilter = createFilter(name: "CIColorControls") else { return }
             contrastFilter.setValue(exposured, forKey: kCIInputImageKey)
             contrastFilter.setValue(1.4, forKey: "inputContrast")
             contrastFilter.setValue(-0.35, forKey: "inputBrightness")
             contrastFilter.setValue(0.6, forKey: "inputSaturation")
             guard let contrasted = contrastFilter.outputImage else { return }
-            let toneCurveFilter = CIFilter(name: "CIToneCurve")!
+            guard let toneCurveFilter = createFilter(name: "CIToneCurve") else { return }
             toneCurveFilter.setValue(contrasted, forKey: kCIInputImageKey)
             toneCurveFilter.setValue(CIVector(x: 0.0, y: 0.0), forKey: "inputPoint0")
             toneCurveFilter.setValue(CIVector(x: 0.2, y: 0.1), forKey: "inputPoint1")
@@ -323,24 +341,24 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             guard let toneCurved = toneCurveFilter.outputImage else { return }
             ciOutput = toneCurved
         case .edge:
-            guard let invertFilter = CIFilter(name: "CIColorInvert") else { return }
+            guard let invertFilter = createFilter(name: "CIColorInvert") else { return }
             invertFilter.setValue(ciInput, forKey: kCIInputImageKey)
             guard let inverted = invertFilter.outputImage else { return }
-            let exposureFilter = CIFilter(name: "CIExposureAdjust")!
+            guard let exposureFilter = createFilter(name: "CIExposureAdjust") else { return }
             exposureFilter.setValue(inverted, forKey: kCIInputImageKey)
             exposureFilter.setValue(-0.2, forKey: "inputEV")
             guard let exposured = exposureFilter.outputImage else { return }
-            guard let contrastFilter = CIFilter(name: "CIColorControls") else { return }
+            guard let contrastFilter = createFilter(name: "CIColorControls") else { return }
             contrastFilter.setValue(exposured, forKey: kCIInputImageKey)
             contrastFilter.setValue(1.3, forKey: "inputContrast")
             contrastFilter.setValue(-0.2, forKey: "inputBrightness")
             contrastFilter.setValue(0.7, forKey: "inputSaturation")
             guard let contrasted = contrastFilter.outputImage else { return }
-            let edgeFilter = CIFilter(name: "CIEdges")!
+            guard let edgeFilter = createFilter(name: "CIEdges") else { return }
             edgeFilter.setValue(contrasted, forKey: kCIInputImageKey)
             edgeFilter.setValue(2.0, forKey: "inputIntensity") // Softer edge
             guard let edgeImage = edgeFilter.outputImage else { return }
-            guard let composite = CIFilter(name: "CISourceOverCompositing") else { return }
+            guard let composite = createFilter(name: "CISourceOverCompositing") else { return }
             composite.setValue(edgeImage, forKey: kCIInputImageKey)
             composite.setValue(contrasted, forKey: kCIInputBackgroundImageKey)
             guard let finalOutput = composite.outputImage else { return }
@@ -377,6 +395,15 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         metalView.draw() // Trigger the view to refresh
     }
 
+    /// Safely create a CIFilter with proper error handling
+    private func createFilter(name: String) -> CIFilter? {
+        guard let filter = CIFilter(name: name) else {
+            print("❌ Failed to create filter: \(name)")
+            return nil
+        }
+        return filter
+    }
+    
     /// Apply a negative LUT to a CIImage using a color cube filter.
     func applyNegativeLUT(to ciImage: CIImage, lutData: Data, dimension: Int = 64) -> CIImage? {
         guard let filter = CIFilter(name: "CIColorCube") else { return nil }
@@ -511,11 +538,14 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         zoomAnimationStart = currentZoom
         zoomAnimationEnd = targetZoom
         zoomAnimationStartTime = CACurrentMediaTime()
-        zoomDisplayLink = CADisplayLink(target: self, selector: #selector(handleZoomAnimation))
+        
+        // Use weak reference to avoid retain cycle
+        let weakTarget = WeakDisplayLinkTarget(target: self)
+        zoomDisplayLink = CADisplayLink(target: weakTarget, selector: #selector(WeakDisplayLinkTarget.handleZoomAnimation))
         zoomDisplayLink?.add(to: .main, forMode: .common)
     }
     
-    @objc private func handleZoomAnimation() {
+    @objc func handleZoomAnimation() {
         let elapsed = CACurrentMediaTime() - zoomAnimationStartTime
         let progress = min(elapsed / zoomAnimationDuration, 1.0)
         // Ease in-out
@@ -610,8 +640,8 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         // Show black screen during transition
         isSwitchingCamera = true
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.performCameraSwitch()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.performCameraSwitch()
         }
     }
     
@@ -665,8 +695,8 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         // Re-enable camera after a short delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.isSwitchingCamera = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.isSwitchingCamera = false
         }
     }
     
@@ -704,6 +734,8 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     deinit {
         manualFocusTimer?.invalidate()
         motionManager?.stopAccelerometerUpdates()
+        zoomDisplayLink?.invalidate()
+        zoomDisplayLink = nil
         session.stopRunning()
     }
 }
