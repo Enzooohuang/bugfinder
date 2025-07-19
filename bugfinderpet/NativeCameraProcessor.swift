@@ -54,11 +54,13 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         didSet {
             if isFrozen {
                 DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                    self?.session.stopRunning()
+                    guard let self = self else { return }
+                    self.session.stopRunning()
                 }
             } else {
                 DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                    self?.session.startRunning()
+                    guard let self = self else { return }
+                    self.session.startRunning()
                 }
             }
         }
@@ -88,6 +90,7 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     private let colorSpace = CGColorSpaceCreateDeviceRGB()
     private var cameraDevice: AVCaptureDevice?
     private var focusIndicator: UIView?
+    private var isValid = true // Flag to prevent processing during deallocation
     
     // For smooth zoom animation
     private var zoomDisplayLink: CADisplayLink?
@@ -191,6 +194,9 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
 
     // MARK: - Frame Processing Delegate
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        // Early exit if object is being deallocated to prevent EXC_BAD_ACCESS
+        guard isValid else { return }
+        
         // Show black screen during camera switching
         if isSwitchingCamera {
             renderBlackScreen()
@@ -367,8 +373,13 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             ciOutput = finalOutput
         }
 
-        // Render to Metal texture
+        // Render to Metal texture with comprehensive safety checks
         guard let drawable = metalView.currentDrawable else { return }
+        
+        // Additional safety checks to prevent EXC_BAD_ACCESS
+        guard metalView.drawableSize.width > 0 && metalView.drawableSize.height > 0 else { return }
+        guard !isSwitchingCamera else { return } // Prevent rendering during camera switching
+        
         let transformedImage = ciOutput.oriented(.right)
         
         // Apply horizontal mirroring for front camera AFTER orientation
@@ -380,8 +391,13 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
             let translation = CGAffineTransform(translationX: finalImage.extent.width, y: 0)
             finalImage = finalImage.transformed(by: translation)
         }
+        
         let sourceExtent = finalImage.extent
         let targetSize = metalView.drawableSize
+        
+        // Validate source extent
+        guard sourceExtent.width > 0 && sourceExtent.height > 0 else { return }
+        
         let scaleX = targetSize.width / sourceExtent.width
         let scaleY = targetSize.height / sourceExtent.height
         let scale = max(scaleX, scaleY)
@@ -391,10 +407,24 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         let cropY = (scaledExtent.height - targetSize.height) / 2
         let cropRect = CGRect(x: cropX, y: cropY, width: targetSize.width, height: targetSize.height)
         let croppedImage = scaledImage.cropped(to: cropRect)
+        
+        // Validate final image bounds before rendering
+        guard croppedImage.extent.width > 0 && croppedImage.extent.height > 0 else { return }
+        guard !croppedImage.extent.isInfinite && !croppedImage.extent.isNull else { return }
+        
+        // Ensure the drawable and texture are still valid before rendering
+        guard drawable.texture.width > 0 && drawable.texture.height > 0 else { 
+            print("❌ Invalid drawable texture dimensions")
+            return 
+        }
+        
+        // Perform the Metal render operation with additional safety
         ciContext.render(croppedImage, to: drawable.texture, commandBuffer: nil, bounds: croppedImage.extent, colorSpace: colorSpace)
+        
         // Present the frame
         drawable.present()
-        metalView.draw() // Trigger the view to refresh
+        
+        metalView.draw()
     }
 
     /// Safely create a CIFilter with proper error handling
@@ -548,6 +578,9 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     }
     
     @objc func handleZoomAnimation() {
+        // Safety check to ensure we're still valid
+        guard zoomDisplayLink != nil else { return }
+        
         let elapsed = CACurrentMediaTime() - zoomAnimationStartTime
         let progress = min(elapsed / zoomAnimationDuration, 1.0)
         // Ease in-out
@@ -606,6 +639,9 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         motionManager?.startAccelerometerUpdates(to: .main) { [weak self] (data, error) in
             guard let self = self, let data = data else { return }
             
+            // Extra safety check to ensure we're still valid
+            guard self.motionManager != nil else { return }
+            
             let acceleration = data.acceleration
             let currentTime = Date()
             
@@ -643,7 +679,8 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         isSwitchingCamera = true
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            self?.performCameraSwitch()
+            guard let self = self else { return }
+            self.performCameraSwitch()
         }
     }
     
@@ -698,7 +735,8 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         
         // Re-enable camera after a short delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            self?.isSwitchingCamera = false
+            guard let self = self else { return }
+            self.isSwitchingCamera = false
         }
     }
     
@@ -707,11 +745,21 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
         guard let drawable = metalView.currentDrawable else { return }
         let targetSize = metalView.drawableSize
         
+        // Additional safety checks to prevent EXC_BAD_ACCESS
+        guard targetSize.width > 0 && targetSize.height > 0 else { return }
+        guard drawable.texture.width > 0 && drawable.texture.height > 0 else { return }
+        
         // Create a black image
         let blackImage = CIImage(color: CIColor.black).cropped(to: CGRect(x: 0, y: 0, width: targetSize.width, height: targetSize.height))
         
+        // Validate black image before rendering
+        guard blackImage.extent.width > 0 && blackImage.extent.height > 0 else { return }
+        guard !blackImage.extent.isInfinite && !blackImage.extent.isNull else { return }
+        
         ciContext.render(blackImage, to: drawable.texture, commandBuffer: nil, bounds: blackImage.extent, colorSpace: colorSpace)
         drawable.present()
+        
+        // Draw on main thread for safety
         metalView.draw()
     }
     
@@ -734,11 +782,21 @@ final class NativeCameraProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffe
     
     // MARK: - Cleanup
     deinit {
+        // Mark as invalid to prevent any further processing
+        isValid = false
+        
+        // Invalidate timer synchronously
         manualFocusTimer?.invalidate()
+        manualFocusTimer = nil
+        
+        // Stop motion manager synchronously to avoid race conditions
         motionManager?.stopAccelerometerUpdates()
+        motionManager = nil
+        
+        // Invalidate display link synchronously
         zoomDisplayLink?.invalidate()
         zoomDisplayLink = nil
-        // Stop session on background queue to avoid blocking deinit
+        
         DispatchQueue.global(qos: .utility).async { [session] in
             session.stopRunning()
         }

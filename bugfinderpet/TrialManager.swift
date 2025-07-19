@@ -54,7 +54,8 @@ class TrialManager: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                self?.endSession()
+                guard let self = self else { return }
+                self.endSession()
             }
         }
         
@@ -64,7 +65,8 @@ class TrialManager: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                self?.endSession()
+                guard let self = self else { return }
+                self.endSession()
             }
         }
         
@@ -89,7 +91,8 @@ class TrialManager: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                self?.saveCurrentSession()
+                guard let self = self else { return }
+                self.saveCurrentSession()
             }
         }
     }
@@ -128,7 +131,8 @@ class TrialManager: ObservableObject {
         // Start timer to update current session time every second
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             Task { @MainActor in
-                self?.updateSessionTime()
+                guard let self = self else { return }
+                self.updateSessionTime()
             }
         }
     }
