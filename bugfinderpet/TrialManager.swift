@@ -10,6 +10,7 @@ class TrialManager: ObservableObject {
     @Published var currentSessionTime: TimeInterval = 0
     @Published var isTrialExpired: Bool = false
     @Published var timeRemaining: TimeInterval = 0
+    @Published var isOnPausingPage: Bool = false // Track if user is on purchase/notification page
     
     private let trialDuration: TimeInterval = 5 * 60 // 5 minutes in seconds
     private let usageKey = "total_usage_time"
@@ -73,8 +74,11 @@ class TrialManager: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                // Only restart if we're not purchased and trial hasn't expired
-                guard let self = self, !InAppPurchaseManager.shared.isPurchased, self.canUseApp() else { return }
+                // Only restart if we're not purchased, trial hasn't expired, and not on a pausing page
+                guard let self = self, 
+                      !InAppPurchaseManager.shared.isPurchased, 
+                      self.canUseApp(),
+                      !self.isOnPausingPage else { return }
                 self.startSession()
             }
         }
@@ -186,6 +190,11 @@ class TrialManager: ObservableObject {
         return InAppPurchaseManager.shared.isPurchased || !isTrialExpired
     }
     
+    /// Set whether user is on a page that should pause the timer
+    func setIsOnPausingPage(_ isPausing: Bool) {
+        isOnPausingPage = isPausing
+    }
+    
     /// Reset trial (for testing purposes - remove in production)
     func resetTrial() {
         UserDefaults.standard.removeObject(forKey: usageKey)
@@ -195,6 +204,7 @@ class TrialManager: ObservableObject {
         totalUsageTime = 0
         currentSessionTime = 0
         isTrialExpired = false
+        isOnPausingPage = false
         
         InAppPurchaseManager.shared.isPurchased = false
         

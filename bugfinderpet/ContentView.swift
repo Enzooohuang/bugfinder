@@ -75,6 +75,8 @@ struct ContentView: View {
                                 // Dismiss notification settings if open before showing purchase overlay
                                 showingNotificationSettings = false
                                 showingPurchaseOverlay = true
+                                // Update pausing state since purchase overlay is now showing
+                                trialManager.setIsOnPausingPage(true)
                             }
                         }
                         
@@ -299,15 +301,23 @@ struct ContentView: View {
                 // Dismiss notification settings if open before showing purchase overlay
                 showingNotificationSettings = false
                 showingPurchaseOverlay = true
+                // Update pausing state since purchase overlay is now showing
+                trialManager.setIsOnPausingPage(true)
             }
         }
         .onChange(of: showingPurchaseOverlay) { _, isShowing in
+            // Update the pausing page state (either overlay counts as pausing)
+            trialManager.setIsOnPausingPage(isShowing || showingNotificationSettings)
+            
             if !isShowing && !purchaseManager.isPurchased && trialManager.canUseApp() {
                 // User dismissed purchase overlay and still has trial time - resume timer
                 trialManager.startSession()
             }
         }
         .onChange(of: showingNotificationSettings) { _, isShowing in
+            // Update the pausing page state (either overlay counts as pausing)
+            trialManager.setIsOnPausingPage(isShowing || showingPurchaseOverlay)
+            
             if isShowing {
                 // Stop trial timer when notification settings are shown
                 trialManager.endSession()
@@ -320,6 +330,8 @@ struct ContentView: View {
             // Show purchase overlay immediately if trial is already expired
             if trialManager.isTrialExpired && !purchaseManager.isPurchased {
                 showingPurchaseOverlay = true
+                // Update pausing state since purchase overlay is now showing
+                trialManager.setIsOnPausingPage(true)
             }
         }
     }
