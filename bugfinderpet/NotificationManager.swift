@@ -144,6 +144,7 @@ class NotificationManager: ObservableObject {
                 content.title = "Post-Walk Bug Check"
                 content.body = "Did you walk your pet recently? Check for fleas and ticks! 🐕"
                 content.sound = .default
+                content.badge = 1
                 
                 var dateComponents = DateComponents()
                 dateComponents.hour = time.hour
